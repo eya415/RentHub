@@ -1,0 +1,1405 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentHub | Premium Camera Rental Service</title>
+  <meta name="description" content="Rent high-quality cameras and photography equipment at affordable prices. Perfect for photographers, videographers, and content creators.">
+  <link rel="stylesheet" href="{% static 'rental/css/style.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preload" href="{% static 'rental/images/hero.jpg' %}" as="image">
+  <style>
+    /* ===============================
+      1. CSS Variables
+    ================================ */
+    :root {
+      --dark-green: #1d4023;
+      --accent-orange: #f7941d;
+      --light-beige: #fefaf5;
+      --soft-shadow: rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ===============================
+      2. Reset & Base
+    ================================ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light-beige);
+      color: #333;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ===============================
+      3. Typography
+    ================================ */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 3rem;
+      font-size: 2.2rem;
+      color: var(--dark-green);
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--accent-orange);
+      border-radius: 2px;
+    }
+
+    /* ===============================
+      4. Navbar
+    ================================ */
+    .navbar {
+      background: #003322;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      transition: var(--transition);
+    }
+
+    .navbar.scrolled {
+      padding: 15px 40px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left .logo {
+      width: 50px;
+      margin-right: 12px;
+      transition: var(--transition);
+    }
+
+    .navbar.scrolled .nav-left .logo {
+      width: 40px;
+    }
+
+    .nav-left h1 {
+      font-size: 2rem;
+      margin: 0;
+      letter-spacing: 1px;
+      background: linear-gradient(to right, #ffa500 50%, white 50%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      letter-spacing: 1px;
+      transition: var(--transition);
+    }
+
+    .navbar.scrolled .nav-left h1 {
+      font-size: 1.8rem;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 600;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-links li a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: var(--accent-orange);
+      transition: var(--transition);
+    }
+
+    .nav-links li a:hover::after,
+    .nav-links li a.nav-btn.active::after {
+      width: calc(100% - 32px);
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.nav-btn.active {
+      color: var(--accent-orange);
+    }
+
+    .dropdown-parent {
+      position: relative;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      display: none;
+      background: white;
+      color: #003322;
+      list-style: none;
+      padding: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      min-width: 200px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-parent:hover .dropdown {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .dropdown li a {
+      color: #003322;
+      padding: 8px 20px;
+      display: block;
+      text-decoration: none;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .dropdown li a:hover {
+      background: rgba(0, 51, 34, 0.1);
+      color: var(--accent-orange);
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: white;
+      transition: var(--transition);
+    }
+
+    .hamburger:hover {
+      color: var(--accent-orange);
+    }
+
+    .nav-cta {
+      background-color: var(--accent-orange);
+      color: #003322;
+      font-weight: bold;
+      padding: 10px 18px;
+      border-radius: 30px;
+      transition: var(--transition);
+      text-align: center;
+      margin-left: 20px;
+      white-space: nowrap;
+      border: 2px solid transparent;
+    }
+
+    .nav-cta:hover {
+      background-color: transparent;
+      color: var(--accent-orange);
+      border-color: var(--accent-orange);
+    }
+
+    .auth-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 20px;
+    }
+
+    .auth-welcome {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-link,
+    .logout-btn {
+      padding: 7px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background-color: transparent;
+      color: #ffa500;
+      border: none;
+      border-bottom: 2px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .auth-link:hover,
+    .logout-btn:hover {
+      color: #fff;
+      border-bottom: 2px solid var(--accent-orange);
+    }
+
+    .auth-link.active {
+      color: white;
+      border-bottom: 2px solid var(--accent-orange);
+    }
+
+    .divider {
+      width: 1px;
+      height: 20px;
+      background-color: var(--accent-orange);
+      opacity: 0.6;
+    }
+
+    /* ===============================
+      5. Hero Section
+    ================================ */
+    .hero {
+      height: 100vh;
+      min-height: 600px;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)), url("{% static 'rental/images/hero.jpg' %}") center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+      margin-top: 80px;
+    }
+
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      max-width: 600px;
+      margin-right: 8%;
+      text-align: right;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    .hero-text blockquote {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      line-height: 1.3;
+      position: relative;
+    }
+
+    .hero-text blockquote::before {
+      content: "“";
+      font-size: 4rem;
+      color: var(--accent-orange);
+      position: absolute;
+      left: -30px;
+      top: -20px;
+      opacity: 0.7;
+    }
+
+    .hero-text p {
+      font-size: 1.2rem;
+      margin-bottom: 2.5rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+
+    .btn {
+      background-color: var(--accent-orange);
+      color: #003322;
+      padding: 0.9rem 2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid transparent;
+    }
+
+    .btn:hover {
+      background-color: transparent;
+      color: white;
+      border-color: white;
+    }
+
+    .btn-outline {
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 0.9rem 2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+      background: #fff;
+      color: var(--dark-green);
+    }
+
+    /* ===============================
+      6. Categories Section
+    ================================ */
+    .scroll-categories {
+      background: #f8f8f8;
+      padding: 5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .category-scroll-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .category-carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 10px;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      flex: 1;
+    }
+
+    .category-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-tag {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      min-width: 160px;
+      box-shadow: var(--box-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      cursor: pointer;
+      border: 2px solid transparent;
+      flex-shrink: 0;
+    }
+
+    .category-tag:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--box-shadow-hover);
+      border-color: var(--accent-orange);
+    }
+
+    .category-tag i {
+      font-size: 2.2rem;
+      color: var(--dark-green);
+      margin-bottom: 1rem;
+      transition: var(--transition);
+    }
+
+    .category-tag:hover i {
+      color: var(--accent-orange);
+    }
+
+    .category-tag span {
+      font-weight: 600;
+      color: #333;
+      font-size: 1rem;
+    }
+
+    .scroll-btn {
+      background: var(--dark-green);
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      transition: var(--transition);
+      opacity: 0.9;
+    }
+
+    .scroll-btn:hover {
+      opacity: 1;
+      background: var(--accent-orange);
+    }
+
+    .scroll-btn.left {
+      left: 0;
+    }
+
+    .scroll-btn.right {
+      right: 0;
+    }
+
+    /* ===============================
+      7. Best Sellers Section
+    ================================ */
+    .best-features {
+      padding: 5rem 2rem;
+      text-align: center;
+      background-color: white;
+      position: relative;
+    }
+
+    .carousel-wrapper {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .products-carousel {
+      display: flex;
+      gap: 25px;
+      overflow-x: auto;
+      padding: 20px 10px;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .products-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 250px;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      position: relative;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .product-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--box-shadow-hover);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      background: #f5f5f5;
+      padding: 10px;
+    }
+
+    .product-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--dark-green);
+    }
+
+    .price {
+      font-weight: 700;
+      color: var(--accent-orange);
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 51, 34, 0.8);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .product-card:hover .overlay {
+      opacity: 1;
+    }
+
+    .overlay i {
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .overlay i:hover {
+      color: var(--accent-orange);
+      transform: scale(1.2);
+    }
+
+    /* ===============================
+      8. Reviews Section
+    ================================ */
+    .reviews-section {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
+      text-align: center;
+    }
+
+    .reviews-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .review-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--box-shadow);
+      padding: 2rem;
+      max-width: 350px;
+      transition: var(--transition);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .review-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--box-shadow-hover);
+    }
+
+    .review-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--accent-orange);
+    }
+
+    .review-top {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-orange);
+      margin-right: 1rem;
+    }
+
+    .reviewer-info h4 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--dark-green);
+    }
+
+    .reviewer-info .role {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .verified {
+      color: var(--accent-orange);
+      font-size: 0.85rem;
+      margin-left: 4px;
+    }
+
+    .review-card blockquote {
+      font-size: 1rem;
+      font-style: italic;
+      color: #444;
+      position: relative;
+      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+      line-height: 1.7;
+    }
+
+    .review-card blockquote::before {
+      content: "“";
+      font-size: 3rem;
+      color: var(--accent-orange);
+      position: absolute;
+      left: -10px;
+      top: -20px;
+      opacity: 0.3;
+    }
+
+    .stars {
+      color: var(--accent-orange);
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-top: 1.5rem;
+    }
+
+    /* ===============================
+      9. Brands Section
+    ================================ */
+    .brands-section {
+      padding: 5rem 2rem;
+      background: white;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .brands-carousel-wrapper {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .brands-carousel {
+      display: flex;
+      gap: 40px;
+      overflow-x: auto;
+      padding: 30px 0;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      align-items: center;
+    }
+
+    .brands-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .brands-carousel img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      filter: grayscale(100%);
+      opacity: 0.7;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .brands-carousel img:hover {
+      filter: grayscale(0);
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* ===============================
+      10. Footer
+    ================================ */
+    footer {
+      background-color: var(--dark-green);
+      color: #fff;
+      text-align: center;
+      padding: 2.5rem 0;
+      position: relative;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent-orange);
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 1.5rem;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .social-links a:hover {
+      color: var(--accent-orange);
+      transform: translateY(-3px);
+    }
+
+    /* ===============================
+      11. Alerts & Toasts
+    ================================ */
+    .alert-box {
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1100;
+      width: 100%;
+      max-width: 500px;
+      padding: 0 20px;
+    }
+
+    .alert {
+      background-color: rgba(212, 237, 218, 0.95);
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(5px);
+    }
+
+    .alert i {
+      margin-right: 10px;
+      color: #28a745;
+    }
+
+    .close-alert {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: 15px;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .close-alert:hover {
+      opacity: 1;
+    }
+
+    /* ===============================
+      12. Animations
+    ================================ */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ===============================
+      13. Responsive Design
+    ================================ */
+    @media screen and (max-width: 1024px) {
+      .hero-text {
+        margin-right: 5%;
+        max-width: 500px;
+      }
+      
+      .hero-text blockquote {
+        font-size: 2rem;
+      }
+      
+      .hero-text p {
+        font-size: 1.1rem;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+      
+      .nav-left h1 {
+        font-size: 1.8rem;
+      }
+      
+      .hamburger {
+        display: block;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        background: white;
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        padding: 0;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      }
+
+      .nav-links.show {
+        display: flex;
+        animation: fadeInDown 0.4s ease-out;
+      }
+
+      .nav-links li {
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+      }
+
+      .nav-links li a {
+        display: block;
+        color: #003322;
+        padding: 15px 0;
+        border-radius: 0;
+      }
+      
+      .nav-links li a:hover,
+      .nav-links li a.nav-btn.active {
+        background: rgba(0,0,0,0.05);
+        color: var(--accent-orange);
+      }
+      
+      .nav-links li a::after {
+        display: none;
+      }
+
+      .dropdown-parent {
+        width: 100%;
+      }
+      
+      .dropdown {
+        position: static;
+        display: none;
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+      
+      .dropdown-parent:hover .dropdown {
+        display: none;
+      }
+      
+      .dropdown-parent.active .dropdown {
+        display: block;
+      }
+      
+      .auth-box {
+        display: none;
+      }
+      
+      .mobile-auth {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 15px 0;
+        border-top: 1px solid rgba(0,0,0,0.1);
+      }
+      
+      .mobile-auth .auth-link,
+      .mobile-auth .logout-btn {
+        color: #003322;
+        text-align: center;
+        padding: 12px 0;
+        border-bottom: none;
+      }
+      
+      .mobile-auth .divider {
+        display: none;
+      }
+
+      .hero {
+        margin-top: 70px;
+        justify-content: center;
+        background-attachment: scroll;
+      }
+      
+      .hero-text {
+        margin-right: 0;
+        padding: 0 20px;
+        text-align: center;
+        max-width: 100%;
+      }
+      
+      .hero-text blockquote {
+        font-size: 1.8rem;
+      }
+      
+      .hero-text blockquote::before {
+        left: 0;
+      }
+      
+      .buttons {
+        justify-content: center;
+      }
+      
+      .category-scroll-wrapper,
+      .carousel-wrapper,
+      .brands-carousel-wrapper {
+        padding: 0 20px;
+      }
+      
+      .scroll-btn {
+        display: none;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .hero-text blockquote {
+        font-size: 1.5rem;
+      }
+      
+      .hero-text p {
+        font-size: 1rem;
+      }
+      
+      .buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn, .btn-outline {
+        width: 100%;
+        text-align: center;
+      }
+      
+      .category-tag {
+        min-width: 140px;
+      }
+      
+      .product-card {
+        min-width: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <img src="{% static 'rental/images/logo.png' %}" alt="RentHub Logo" class="logo">
+      <h1>RENTHUB</h1>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    <ul class="nav-links" id="menu">
+      <li><a href="{% url 'home' %}" class="nav-btn {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+      <li><a href="{% url 'about' %}" class="nav-btn {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a></li>
+      <li><a href="{% url 'gallery' %}" class="nav-btn {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">Store</a></li>
+      
+      <li class="dropdown-parent" onclick="toggleDropdown(event)">
+        <a href="#" class="nav-btn">My Account <i class="fas fa-caret-down"></i></a>
+        <ul class="dropdown">
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+            <li><a href="{% url 'checkout' %}"><i class="fas fa-credit-card"></i> Checkout</a></li>
+            <li><a href="{% url 'my_orders' %}"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}?next={% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+            <li><a href="{% url 'login' %}?next={% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+            <li><a href="{% url 'login' %}?next={% url 'checkout' %}"><i class="fas fa-credit-card"></i> Checkout</a></li>
+            <li><a href="{% url 'login' %}?next={% url 'my_orders' %}"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+          {% endif %}
+        </ul>
+      </li>
+      
+      <li><a href="#" class="nav-btn">Contact</a></li>
+      
+      
+    
+    <!-- Desktop Auth Section -->
+    {% if user.is_authenticated %}
+    <div class="auth-box desktop-only">
+      <span class="auth-welcome">Hi, {{ user.username }}</span>
+      <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="auth-box desktop-only">
+      <a href="{% url 'login' %}" class="auth-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}">Login</a>
+      <span class="divider"></span>
+      <a href="{% url 'register' %}" class="auth-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a>
+    </div>
+    {% endif %}
+
+
+    
+       
+    
+
+
+
+  </nav>
+
+  <!-- Messages/Alerts -->
+  {% if messages %}
+    <div class="alert-box">
+      {% for message in messages %}
+        <div class="alert fadeIn">
+          <div>
+            <i class="fas fa-check-circle"></i>
+            {{ message }}
+          </div>
+          <button class="close-alert" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-text">
+      <blockquote>“Empowering creators with the tools to capture the extraordinary.”</blockquote>
+      <p>At RentHub, we believe in empowering creators by making high-quality cameras and gear accessible to everyone. Start your creative journey today.</p>
+      <div class="buttons">
+        <a href="{% url 'gallery' %}" class="btn">Rent Products</a>
+        <a href="{% url 'contact' %}" class="btn-outline">Contact Us</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categories Section -->
+  <section class="scroll-categories">
+    <h2 class="section-title">Browse by Category</h2>
+
+    <div class="category-scroll-wrapper">
+      <button class="scroll-btn left" onclick="scrollCategoriesLeft()">&#10094;</button>
+
+      <div class="category-carousel" id="category-carousel">
+        {% for category in categories %}
+          <a href="{% url 'gallery' %}?category={{ category.id }}" class="category-tag">
+            <i class="{{ category.icon_class|default:'fas fa-camera' }}"></i>
+            <span>{{ category.name }}</span>
+          </a>
+        {% endfor %}
+      </div>
+
+      <button class="scroll-btn right" onclick="scrollCategoriesRight()">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- Best Sellers Section -->
+  <section class="best-features">
+    <h2 class="section-title">Best Sellers</h2>
+
+    <div class="carousel-wrapper">
+      <button class="scroll-btn left" onclick="scrollLeft()">&#10094;</button>
+      <button class="scroll-btn right" onclick="scrollRight()">&#10095;</button>
+
+      <div class="products-carousel" id="carousel">
+        {% for product in best_sellers %}
+          <div class="product-card">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            {% else %}
+              <img src="{% static 'rental/images/placeholder.jpg' %}" alt="No Image" loading="lazy">
+            {% endif %}
+            <h4>{{ product.name }}</h4>
+            <p class="price">EGP {{ product.price }}/day</p>
+            <div class="overlay">
+              <a href="{% url 'add_to_cart' product.id %}" title="Add to Cart">
+                <i class="fas fa-cart-plus"></i>
+              </a>
+              <a href="{% url 'add_to_wishlist' product.id %}" title="Add to Wishlist">
+                <i class="fas fa-heart"></i>
+              </a>
+              <a href="{% url 'product_detail' product.id %}" title="View Details">
+                <i class="fas fa-eye"></i>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-section">
+    <h2 class="section-title">What Our Clients Are Saying</h2>
+    <div class="reviews-wrapper">
+      <div class="review-card">
+      <div class="review-top">
+        <img src="{% static 'rental/images/user1.png' %}" alt="Salma" class="avatar">
+        <div class="reviewer-info">
+          <h4>Salma E.</h4>
+          <p class="role">Photographer <span class="verified">✔ Verified</span></p>
+        </div>
+      </div>
+      <blockquote>“RentHub made my travel project so much easier. The quality of the camera was top-notch and the service was seamless.”</blockquote>
+      <div class="stars">★★★★★</div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-top">
+        <img src="{% static 'rental/images/user2.png' %}" alt="Omar" class="avatar">
+        <div class="reviewer-info">
+          <h4>Omar K.</h4>
+          <p class="role">Content Creator <span class="verified">✔ Verified</span></p>
+        </div>
+      </div>
+      <blockquote>“Excellent service and support. I rented a drone and captured breathtaking footage for my YouTube channel.”</blockquote>
+      <div class="stars">★★★★★</div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-top">
+        <img src="{% static 'rental/images/user3.jpg' %}" alt="Asma" class="avatar">
+        <div class="reviewer-info">
+          <h4>Asma B.</h4>
+          <p class="role">Videographer <span class="verified">✔ Verified</span></p>
+        </div>
+      </div>
+      <blockquote>“Affordable prices, easy booking, and high-end equipment. The whole process was professional and smooth!”</blockquote>
+      <div class="stars">★★★★</div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ░░░ Our Brands ░░░ -->
+<section class="brands-section">
+  <h2 class="section-title">Our Trusted Brands</h2>
+  <div class="brands-carousel-wrapper">
+    <div class="brands-carousel" id="brands-carousel">
+      <!-- Add transparent PNG logos -->
+      <img src="{% static 'rental/brands/canon.png' %}" alt="Canon">
+      <img src="{% static 'rental/brands/atomos.png' %}" alt="Atomos">
+      <img src="{% static 'rental/brands/sony.png' %}" alt="Sony">
+      <img src="{% static 'rental/brands/nikon.png' %}" alt="Nikon">
+      <img src="{% static 'rental/brands/tilta.png' %}" alt="Tilta">
+      <img src="{% static 'rental/brands/godox.png' %}" alt="Godox">
+      <img src="{% static 'rental/brands/epson.png' %}" alt="Epson">
+      <img src="{% static 'rental/brands/profoto.png' %}" alt="Profoto">
+      <img src="{% static 'rental/brands/black.png' %}" alt="Blackmagic">
+      <img src="{% static 'rental/brands/sandisk.png' %}" alt="Sandisk">
+      <img src="{% static 'rental/brands/shneiser.png' %}" alt="Sennheiser">
+      <img src="{% static 'rental/brands/dji.png' %}" alt="Dji">
+      <img src="{% static 'rental/brands/smallrig.png' %}" alt="SmallRig">
+      <img src="{% static 'rental/brands/puture.png' %}" alt="Aputure">
+      <img src="{% static 'rental/brands/jinbei.png' %}" alt="Jinbei">
+      <img src="{% static 'rental/brands/hollyland.png' %}" alt="HollyLand">
+      <img src="{% static 'rental/brands/fujifilm.png' %}" alt="Fujifilm">
+
+      <!-- Duplicated -->
+       <img src="{% static 'rental/brands/canon.png' %}" alt="Canon">
+      <img src="{% static 'rental/brands/atomos.png' %}" alt="Atomos">
+      <img src="{% static 'rental/brands/sony.png' %}" alt="Sony">
+      <img src="{% static 'rental/brands/nikon.png' %}" alt="Nikon">
+      <img src="{% static 'rental/brands/tilta.png' %}" alt="Tilta">
+      <img src="{% static 'rental/brands/godox.png' %}" alt="Godox">
+      <img src="{% static 'rental/brands/epson.png' %}" alt="Epson">
+      <img src="{% static 'rental/brands/profoto.png' %}" alt="Profoto">
+      <img src="{% static 'rental/brands/black.png' %}" alt="Blackmagic">
+      <img src="{% static 'rental/brands/sandisk.png' %}" alt="Sandisk">
+      <img src="{% static 'rental/brands/shneiser.png' %}" alt="Sennheiser">
+      <img src="{% static 'rental/brands/dji.png' %}" alt="Dji">
+      <img src="{% static 'rental/brands/smallrig.png' %}" alt="SmallRig">
+      <img src="{% static 'rental/brands/puture.png' %}" alt="Aputure">
+      <img src="{% static 'rental/brands/jinbei.png' %}" alt="Jinbei">
+      <img src="{% static 'rental/brands/hollyland.png' %}" alt="HollyLand">
+      <img src="{% static 'rental/brands/fujifilm.png' %}" alt="Fujifilm">
+
+
+
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ░░░ Footer ░░░ -->
+<footer>
+  <p>&copy; 2025 RentHub. All rights reserved.</p>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('show');
+  }
+</script>
+<script src="{% static 'rental/js/carousel.js' %}"></script>
+
+
+<script>
+  const carousel = document.getElementById('carousel');
+  const scrollAmount = 270; // Adjust based on card width + gap
+
+  function scrollRight() {
+    carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+
+  function scrollLeft() {
+    carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  }
+
+  // Optional: Auto-scroll
+  let autoScrollInterval;
+  function startAutoScroll() {
+    autoScrollInterval = setInterval(() => {
+      if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth) {
+        carousel.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        scrollRight();
+      }
+    }, 4000);
+  }
+
+  carousel.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+  carousel.addEventListener('mouseleave', startAutoScroll);
+
+  startAutoScroll();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toasts = document.querySelectorAll('.toast');
+
+    toasts.forEach((toast) => {
+      // Initial animation already handled by CSS
+      setTimeout(() => {
+        // Apply slide-out animation
+        toast.style.animation = 'slideOutFade 0.8s forwards';
+
+        // Remove element from DOM after animation ends
+        setTimeout(() => {
+          toast.remove();
+        }, 800);
+      }, 3000); // How long toast stays visible (3s)
+    });
+  });
+</script>
+
+<script>
+  (function () {
+    const isReload = performance.getEntriesByType("navigation")[0]?.type === "reload";
+
+    // Save scroll position only if user is navigating, not reloading
+    window.addEventListener("beforeunload", () => {
+      if (!isReload) {
+        sessionStorage.setItem("scrollPos", window.scrollY);
+      }
+    });
+
+    // Restore scroll smoothly
+    window.addEventListener("DOMContentLoaded", () => {
+      const scrollPos = sessionStorage.getItem("scrollPos");
+      if (scrollPos !== null) {
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(scrollPos), behavior: "smooth" });
+          sessionStorage.removeItem("scrollPos");
+        }, 150); // Small delay to allow DOM rendering
+      }
+    });
+  })();
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<script>
+function scrollCategoriesLeft() {
+  document.getElementById("category-carousel").scrollBy({ left: -200, behavior: 'smooth' });
+}
+
+function scrollCategoriesRight() {
+  document.getElementById("category-carousel").scrollBy({ left: 200, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
+

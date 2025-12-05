@@ -1,0 +1,151 @@
+<h2 class="mb-4">Order History</h2>
+
+{% if orders %}
+<div class="orders-container">
+  {% for order in orders %}
+  <div class="order-card mb-4 p-4 border rounded shadow-sm">
+    <div class="order-header d-flex justify-content-between align-items-center mb-3">
+      <h3 class="h5 mb-0">
+        <strong>Order #{{ order.id }}</strong>
+        <span class="text-muted">- {{ order.created_at|date:"F j, Y" }}</span>
+      </h3>
+      <span class="badge 
+        {% if order.status == 'Completed' %}bg-success
+        {% elif order.status == 'Processing' %}bg-primary
+        {% elif order.status == 'Cancelled' %}bg-danger
+        {% elif order.status == 'Shipped' %}bg-info
+        {% else %}bg-secondary{% endif %}">
+        {{ order.status }}
+      </span>
+    </div>
+
+    <div class="row">
+      <!-- Delivery Information -->
+      <div class="col-md-6 mb-3">
+        <div class="delivery-info p-3 bg-light rounded">
+          <h4 class="h6 mb-3"><i class="bi bi-truck me-2"></i>Delivery Details</h4>
+          <p><strong>Full Name:</strong> {{ order.full_name }}</p>
+          <p><strong>Phone:</strong> {{ order.phone }}</p>
+          <p><strong>Address:</strong> {{ order.address }}</p>
+          <p><strong>City:</strong> {{ order.city }}</p>
+          <p><strong>Country:</strong> {{ order.country }}</p>
+          
+          {% if order.tracking_number %}
+          <div class="tracking mt-3">
+            <p class="mb-1"><strong>Tracking Number:</strong></p>
+            <a href="#" class="btn btn-sm btn-outline-primary">Track Package</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="col-md-6">
+        <h4 class="h6 mb-3"><i class="bi bi-cart me-2"></i>Order Items</h4>
+        <ul class="list-group mb-3">
+          {% for item in order.items.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ item.product.name }}</strong>
+              <div class="text-muted small">SKU: {{ item.product.sku|default:"N/A" }}</div>
+            </div>
+            <span>{{ item.quantity }} × ${{ item.price }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <div class="order-summary p-3 bg-light rounded">
+          <div class="d-flex justify-content-between mb-1">
+            <span>Subtotal:</span>
+            <span>${{ order.get_subtotal }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span>Shipping:</span>
+            <span>${{ order.shipping_cost|default:"0.00" }}</span>
+          </div>
+          {% if order.discount_amount %}
+          <div class="d-flex justify-content-between mb-1 text-success">
+            <span>Discount:</span>
+            <span>-${{ order.discount_amount }}</span>
+          </div>
+          {% endif %}
+          <div class="d-flex justify-content-between mt-2 fw-bold">
+            <span>Total:</span>
+            <span>${{ order.total_price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-actions mt-3 d-flex justify-content-between">
+      <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-eye me-1"></i>View Details
+      </a>
+      <div>
+        {% if order.status == 'Processing' %}
+        <button class="btn btn-sm btn-outline-danger me-2">
+          <i class="bi bi-x-circle me-1"></i>Cancel Order
+        </button>
+        {% endif %}
+        <button class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-repeat me-1"></i>Reorder
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if orders.has_other_pages %}
+<nav aria-label="Order pagination">
+  <ul class="pagination justify-content-center">
+    {% if orders.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page=1" aria-label="First">
+        <span aria-hidden="true">&laquo;&laquo;</span>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="?page={{ orders.previous_page_number }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %}
+
+    {% for num in orders.paginator.page_range %}
+      {% if orders.number == num %}
+      <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+      {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+      <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if orders.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ orders.next_page_number }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="?page={{ orders.paginator.num_pages }}" aria-label="Last">
+        <span aria-hidden="true">&raquo;&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty-orders text-center py-5">
+  <div class="empty-icon mb-3">
+    <i class="bi bi-cart-x" style="font-size: 3rem; color: #6c757d;"></i>
+  </div>
+  <h3 class="h4 mb-3">You haven't placed any orders yet</h3>
+  <p class="text-muted mb-4">When you place an order, it will appear here along with tracking information.</p>
+  <a href="{% url 'products' %}" class="btn btn-primary">
+    <i class="bi bi-shop me-2"></i>Continue Shopping
+  </a>
+</div>
+{% endif %}
